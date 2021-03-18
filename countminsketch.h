@@ -38,6 +38,14 @@ class CountMinSketch{
 
     void store(const T data) noexcept;
     const unsigned int getCount(const T data);
+
+    inline void reset() noexcept {
+      for(auto& row: counts){
+        for(int i = 0; i < width; ++i){
+          counts[i] = 0;
+        }
+      }
+    }
 };
 
 /*--------------------------------- Implementations ------------------------------------*/
