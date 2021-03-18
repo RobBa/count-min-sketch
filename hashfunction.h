@@ -19,9 +19,9 @@ template<typename T>
 class HashFunction{
 private:
   const int seed;
-  static const std::hash<T> objHash; // TODO: make static to save memory?
-  static const std::hash<int> intHash; // TODO: make static to save memory?
-
+  static const std::hash<T> objHash;
+  static const std::hash<int> intHash;
+  
 public:
   HashFunction() : HashFunction(rand()) {}
   HashFunction(int seed) : seed(seed) {}

@@ -31,6 +31,11 @@ class CountMinSketch{
     CountMinSketch() = delete;
     CountMinSketch(int width, int depth);
 
+    void operator+(const CountMinSketch<T>& other);
+    void operator-(const CountMinSketch<T>& other);
+
+    static float cosineSimilarity(const CountMinSketch<T>& c1, const CountMinSketch<T>&c2);
+
     void store(const T data) noexcept;
     const unsigned int getCount(const T data);
 };
@@ -86,6 +91,73 @@ inline const unsigned int CountMinSketch<T>::getCount(const T data){
   }
 
   return minVal;
+}
+
+/**
+ * @brief Adds the two count-min-sketches. Can only be done when sizes equal.
+ * 
+ * @tparam T Type. 
+ * @param other The other cms.
+ * @return CountMinSketch<T> The result.
+ */
+template<typename T>
+inline void CountMinSketch<T>::operator+(const CountMinSketch<T>& other){
+  assert(this->width == other.width && this->depth == other.depth);
+
+	for(int i = 0; i < depth; ++i){
+    for(int j = 0; j < width; ++j){
+      this->counts[i][j] += other.counts[i][j];
+    }
+  }
+}
+ 
+ /**
+ * @brief Subtracts the two count-min-sketches. Can only be done when sizes equal.
+ * 
+ * @tparam T Type. 
+ * @param other The other cms.
+ * @return CountMinSketch<T> The result.
+ */
+template<typename T>
+inline void CountMinSketch<T>::operator-(const CountMinSketch<T>& other){
+  assert(this->width == other.width && this->depth == other.depth);
+
+	for(int i = 0; i < depth; ++i){
+    for(int j = 0; j < width; ++j){
+      this->counts[i][j] -= other.counts[i][j];
+    }
+  }
+}
+
+/**
+ * @brief Computes average cosine similarity among two sketches.
+ * 
+ * @param c1 Sketch 1.
+ * @param c2 Sketch 2.
+ * @return float The average similarity.
+ */
+template <typename T>
+float CountMinSketch<T>::cosineSimilarity(const CountMinSketch<T>& c1, const CountMinSketch<T>&c2){
+  assert(c1.width == c2.width && c1.depth == c2.depth);
+  float res = 0;
+
+  for(int i = 0; i < c1.depth; ++i){
+    const auto& v1 = c1.counts[i];
+    const auto& v2 = c2.counts[i];
+
+    float dot = 0, absolute1 = 0, absolute2 = 0;
+    for(int j = 0; j < c2.width; ++j){
+      dot += v1[j] * v2[j];
+      absolute1 += pow(v1[j], 2);
+      absolute2 += pow(v2[j], 2);
+    }
+    absolute1 = sqrt(absolute1);
+    absolute2 = sqrt(absolute2);
+
+    res += dot / (absolute1 * absolute2 + 1e-6);
+  }
+
+  return res / c1.depth;
 }
 
 #endif
