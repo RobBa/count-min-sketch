@@ -42,7 +42,7 @@ class CountMinSketch{
     inline void reset() noexcept {
       for(auto& row: counts){
         for(int i = 0; i < width; ++i){
-          counts[i] = 0;
+          row[i] = 0;
         }
       }
     }
